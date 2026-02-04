@@ -4,26 +4,23 @@ pipeline {
     options { skipDefaultCheckout() }
 
     stages {
-        stage('SetUp'){
-            steps {
-                sh '''
-                    python3 -m venv venv
-                    . venv/bin/activate
-                    pip install --upgrade pip
-                    pip install flake8 bandit pytest boto3 requests
-                '''
-            }
-        }
         stage( 'Get Code') {
             steps {
                 git branch: 'develop', url: 'https://github.com/migueldonaire/todo-list-aws.git'
+                stash name:'code', includes:'**'
+                script {
+                    deleteDir()
+                }
             }
         }
 
         stage('Static Test') {
             steps {
+                unstash name:'code'
                 sh '''
+                    python3 -m venv venv
                     . venv/bin/activate
+                    pip install flake8 bandit
                     flake8 src/ --format=html --htmldir=flake8-report || true
                     bandit -r src/ -f html -o bandit-report.html || true
                 '''
@@ -32,12 +29,14 @@ pipeline {
                 always {
                     publishHTML([reportDir: '.', reportFiles: 'flake8-report/index.html', reportName: 'Flake8'])
                     publishHTML([reportDir: '.', reportFiles: 'bandit-report.html', reportName: 'Bandit'])
+                    deleteDir()
                 }
             }
         }
 
         stage('Deploy') {
             steps {
+                unstash name:'code'
                 sh '''
                     sam build
                     sam deploy --config-env staging --no-fail-on-empty-changeset --no-progressbar
@@ -47,8 +46,11 @@ pipeline {
 
         stage('Rest Test') {
             steps {
+                unstash name:'code'
                 sh '''
+                    python3 -m venv venv
                     . venv/bin/activate
+                    pip install pytest boto3 requests
                     BASE_URL=$(aws cloudformation describe-stacks \
                         --stack-name todo-list-aws-staging \
                         --query 'Stacks[0].Outputs[?OutputKey==`BaseUrlApi`].OutputValue' \
@@ -57,16 +59,23 @@ pipeline {
                     export BASE_URL
                     pytest test/integration/todoApiTest.py -v
                 '''
+                script {
+                    deleteDir()
+                }
             }
         }
         
         stage('Promote') {
             steps {
+                unstash name:'code'
                 sh '''
                     git checkout master
                     git merge develop
                     git push origin master
                 '''
+                script {
+                    deleteDir()
+                }
             }
         }
     }
