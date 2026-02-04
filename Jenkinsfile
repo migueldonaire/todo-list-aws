@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage( 'Get Code') {
             steps {
-                git branch: 'develop', url: ' https://migueldonaire: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@github.com/migueldonaire/todo-list-aws.git'
+                git branch: 'develop', url: ' https://migueldonaire@github.com/migueldonaire/todo-list-aws.git'
                 stash name:'code', includes:'**'
                 script {
                     deleteDir()
