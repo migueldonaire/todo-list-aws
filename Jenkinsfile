@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage( 'Get Code') {
             steps {
-                git branch: 'develop', url: 'https://github.com/migueldonaire/todo-list-aws.git'
+                git branch: 'develop', url: ' https://migueldonaire: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@github.com/migueldonaire/todo-list-aws.git'
                 stash name:'code', includes:'**'
                 script {
                     deleteDir()
@@ -20,7 +20,7 @@ pipeline {
                 sh '''
                     python3 -m venv venv
                     . venv/bin/activate
-                    pip install flake8 bandit
+                    pip install flake8 flake8-html bandit
                     flake8 src/ --format=html --htmldir=flake8-report || true
                     bandit -r src/ -f html -o bandit-report.html || true
                 '''
@@ -39,7 +39,7 @@ pipeline {
                 unstash name:'code'
                 sh '''
                     sam build
-                    sam deploy --config-env staging --no-fail-on-empty-changeset --no-progressbar
+                    sam deploy --config-env staging --resolve-s3 --no-fail-on-empty-changeset --no-progressbar
                 '''
             }
         }
