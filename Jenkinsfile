@@ -39,7 +39,7 @@ pipeline {
                 unstash name:'code'
                 sh '''
                     sam build
-                    sam deploy --config-env staging --resolve-s3 --no-fail-on-empty-changeset --no-progressbar
+                    sam deploy --config-env staging --no-fail-on-empty-changeset --no-progressbar
                 '''
             }
         }
