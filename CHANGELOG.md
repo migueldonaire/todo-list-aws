@@ -20,3 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.3] - 2021-01-08
 ### Added
 - Versión jenkinsfile reto3.
+
+## [1.0.4] - 2021-01-08
+### Added
+- Fix docker user permissions
