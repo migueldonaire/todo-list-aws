@@ -4,9 +4,11 @@ pipeline {
     options { skipDefaultCheckout() }
 
     stages {
-        stage( 'Get Code') {
+        stage('Get Code') {
             steps {
-                git branch: 'develop', url: 'https://migueldonaire@github.com/migueldonaire/todo-list-aws.git'
+                git branch: 'develop',
+                    url: 'https://github.com/migueldonaire/todo-list-aws.git',
+                    credentialsId: 'github-credentials'
                 stash name:'code', includes:'**'
                 script {
                     deleteDir()
@@ -27,8 +29,22 @@ pipeline {
             }
             post {
                 always {
-                    publishHTML([reportDir: '.', reportFiles: 'flake8-report/index.html', reportName: 'Flake8'])
-                    publishHTML([reportDir: '.', reportFiles: 'bandit-report.html', reportName: 'Bandit'])
+                    publishHTML(target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'flake8-report',
+                        reportFiles: 'index.html',
+                        reportName: 'Flake8'
+                    ])
+                    publishHTML(target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: '.',
+                        reportFiles: 'bandit-report.html',
+                        reportName: 'Bandit'
+                    ])
                     deleteDir()
                 }
             }
@@ -57,22 +73,29 @@ pipeline {
                         --region us-east-1 \
                         --output text)
                     export BASE_URL
-                    pytest test/integration/todoApiTest.py -v
+                    pytest test/integration/todoApiTest.py -v --tb=short
                 '''
                 script {
                     deleteDir()
                 }
             }
         }
-        
+
         stage('Promote') {
             steps {
-                unstash name:'code'
-                sh '''
-                    git checkout master
-                    git merge develop
-                    git push origin master
-                '''
+                git branch: 'develop',
+                    url: 'https://github.com/migueldonaire/todo-list-aws.git',
+                    credentialsId: 'github-credentials'
+                withCredentials([usernamePassword(credentialsId: 'github-credentials', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
+                    sh '''
+                        git config user.email "jenkins@example.com"
+                        git config user.name "Jenkins"
+                        git checkout master
+                        git merge develop
+                        git remote set-url origin https://${GIT_USER}:${GIT_TOKEN}@github.com/migueldonaire/todo-list-aws.git
+                        git push origin master
+                    '''
+                }
                 script {
                     deleteDir()
                 }
