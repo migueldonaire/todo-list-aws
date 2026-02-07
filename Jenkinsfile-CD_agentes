@@ -1,6 +1,8 @@
 pipeline {
     agent any
 
+    options { skipDefaultCheckout() }
+
     stages {
         stage('Get Code') {
             steps {
@@ -44,11 +46,10 @@ pipeline {
             steps {
                 unstash name:'code'
                 sh '''
-                    echo "Usuario actual:"
-                    whoami
-                    echo "Nombre del host:"
-                    hostname
-                    echo ${WORKSPACE}
+                    echo "=== Agent Info ==="
+                    echo "Node Name: ${NODE_NAME}"
+                    echo "Container ID: $(cat /etc/hostname)"
+                    echo "User: $(whoami)"
                     python3 -m venv venv
                     . venv/bin/activate
                     pip install pytest boto3 requests
