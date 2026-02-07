@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Get Code') {
+            steps {
+                git branch: 'master',
+                    url: 'https://github.com/migueldonaire/todo-list-aws.git',
+                    credentialsId: 'github-credentials'
+            }
+        }
+
+        stage('Deploy Production') {
+            steps {
+                sh '''
+                    sam build
+                    sam deploy --config-env production --no-fail-on-empty-changeset --no-progressbar
+                '''
+            }
+        }
+
+        stage('Rest Test') {
+            steps {
+                sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install pytest boto3 requests
+                    BASE_URL=$(aws cloudformation describe-stacks \
+                        --stack-name todo-list-aws-production \
+                        --query 'Stacks[0].Outputs[?OutputKey==`BaseUrlApi`].OutputValue' \
+                        --region us-east-1 \
+                        --output text)
+                    export BASE_URL
+                    pytest test/integration/todoApiTest.py -k "test_api_listtodos or test_api_gettodo" -v
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}

@@ -73,7 +73,7 @@ pipeline {
                         --region us-east-1 \
                         --output text)
                     export BASE_URL
-                    pytest test/integration/todoApiTest.py -v --tb=short
+                    pytest test/integration/todoApiTest.py -v
                 '''
                 script {
                     deleteDir()
