@@ -24,3 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.4] - 2021-01-08
 ### Added
 - Fix docker cloud config
+
+
+## [1.0.5] - 2021-01-08
+### Added
+- Fix custom docker image with python
