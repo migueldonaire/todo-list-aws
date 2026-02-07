@@ -8,6 +8,13 @@ pipeline {
                     url: 'https://github.com/migueldonaire/todo-list-aws.git',
                     credentialsId: 'github-credentials'
                 stash name:'code', includes:'**'
+                 sh '''
+                    echo "Usuario actual:"
+                    whoami
+                    echo "Nombre del host:"
+                    hostname
+                    echo ${WORKSPACE}
+                '''
                 script {
                     deleteDir()
                 }
@@ -18,6 +25,11 @@ pipeline {
             steps {
                 unstash name:'code'
                 sh '''
+                    echo "Usuario actual:"
+                    whoami
+                    echo "Nombre del host:"
+                    hostname
+                    echo ${WORKSPACE}
                     sam build
                     sam deploy --config-env production --no-fail-on-empty-changeset --no-progressbar
                 '''
@@ -28,9 +40,15 @@ pipeline {
         }
 
         stage('Rest Test') {
+            agent {label 'rest-agent'}
             steps {
                 unstash name:'code'
                 sh '''
+                    echo "Usuario actual:"
+                    whoami
+                    echo "Nombre del host:"
+                    hostname
+                    echo ${WORKSPACE}
                     python3 -m venv venv
                     . venv/bin/activate
                     pip install pytest boto3 requests
