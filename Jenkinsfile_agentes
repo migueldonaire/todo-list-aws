@@ -28,6 +28,11 @@ pipeline {
             steps {
                 unstash name:'code'
                 sh '''
+                    echo "Usuario actual:"
+                    whoami
+                    echo "Nombre del host:"
+                    hostname
+                    echo ${WORKSPACE}
                     echo "=== Agent Info ==="
                     echo "Node Name: ${NODE_NAME}"
                     echo "Container ID: $(cat /etc/hostname)"
@@ -82,6 +87,11 @@ pipeline {
             steps {
                 unstash name:'code'
                 sh '''
+                    echo "Usuario actual:"
+                    whoami
+                    echo "Nombre del host:"
+                    hostname
+                    echo ${WORKSPACE}
                     echo "=== Agent Info ==="
                     echo "Node Name: ${NODE_NAME}"
                     echo "Container ID: $(cat /etc/hostname)"
