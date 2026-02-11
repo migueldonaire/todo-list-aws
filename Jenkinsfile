@@ -9,15 +9,6 @@ pipeline {
                 git branch: 'develop',
                     url: 'https://github.com/migueldonaire/todo-list-aws.git',
                     credentialsId: 'github-credentials'
-                script {
-                    // Skip build if last commit was made by Jenkins
-                    def commitAuthor = sh(script: 'git log -1 --pretty=%ae', returnStdout: true).trim()
-                    if (commitAuthor == 'jenkins@example.com') {
-                        currentBuild.result = 'SUCCESS'
-                        currentBuild.description = 'Skipped - Jenkins automated commit'
-                        error('Build skipped - commit made by Jenkins')
-                    }
-                }
                 stash name:'code', includes:'**'
                 script {
                     deleteDir()
@@ -100,32 +91,6 @@ pipeline {
                         git config user.email "jenkins@example.com"
                         git config user.name "Jenkins"
                         git remote set-url origin https://${GIT_USER}:${GIT_TOKEN}@github.com/migueldonaire/todo-list-aws.git
-
-                        # Obtener última versión del CHANGELOG
-                        LAST_VERSION=$(grep -oP '(?<=## \\[)[0-9]+\\.[0-9]+\\.[0-9]+' CHANGELOG.md | head -1)
-                        echo "Última versión: $LAST_VERSION"
-
-                        # Incrementar patch version
-                        MAJOR=$(echo $LAST_VERSION | cut -d. -f1)
-                        MINOR=$(echo $LAST_VERSION | cut -d. -f2)
-                        PATCH=$(echo $LAST_VERSION | cut -d. -f3)
-                        NEW_PATCH=$((PATCH + 1))
-                        NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
-                        echo "Nueva versión: $NEW_VERSION"
-
-                        # Fecha actual
-                        TODAY=$(date +%Y-%m-%d)
-
-                        # Crear nueva entrada en CHANGELOG (insertar en línea 7)
-                        sed -i "7i\\
-## [${NEW_VERSION}] - ${TODAY}\\
-### Changed\\
-- Actualizado automáticamente por Jenkins (Build #${BUILD_NUMBER})\\
-" CHANGELOG.md
-                        # Commit en develop
-                        git add CHANGELOG.md
-                        git commit -m "chore: bump version to ${NEW_VERSION} [skip ci]"
-                        git push origin develop
 
                         # Merge a master
                         git checkout master
