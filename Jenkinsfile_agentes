@@ -150,7 +150,7 @@ pipeline {
 
                         # Commit en develop
                         git add CHANGELOG.md
-                        git commit -m "chore: bump version to ${NEW_VERSION} [Jenkins]"
+                        git commit -m "chore: bump version to ${NEW_VERSION} [skip ci]"
                         git push origin develop
 
                         # Merge a master
