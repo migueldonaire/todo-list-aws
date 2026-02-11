@@ -3,22 +3,20 @@ pipeline {
 
     options { skipDefaultCheckout() }
 
-    triggers {
-        GenericTrigger(
-            genericVariables: [
-                [key: 'commit_message', value: '$.head_commit.message']
-            ],
-            regexpFilterText: '$commit_message',
-            regexpFilterExpression: '^(?!.*\\[skip ci\\]).*$'
-        )
-    }
-
     stages {
         stage('Get Code') {
             steps {
                 git branch: 'develop',
                     url: 'https://github.com/migueldonaire/todo-list-aws.git',
                     credentialsId: 'github-credentials'
+                script {
+                    def commitMsg = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
+                    if (commitMsg.contains('[skip ci]')) {
+                        currentBuild.result = 'SUCCESS'
+                        currentBuild.description = 'Skipped - Jenkins commit'
+                        error('Build skipped - commit contains [skip ci]')
+                    }
+                }
                 sh '''
                     echo "Usuario actual:"
                     whoami
