@@ -3,22 +3,21 @@ pipeline {
 
     options { skipDefaultCheckout() }
 
-    triggers {
-        GenericTrigger(
-            genericVariables: [
-                [key: 'commit_message', value: '$.head_commit.message']
-            ],
-            regexpFilterText: '$commit_message',
-            regexpFilterExpression: '^(?!.*\\[skip ci\\]).*$'
-        )
-    }
-
     stages {
         stage('Get Code') {
             steps {
                 git branch: 'develop',
                     url: 'https://github.com/migueldonaire/todo-list-aws.git',
                     credentialsId: 'github-credentials'
+                script {
+                    // Skip build if last commit was made by Jenkins
+                    def commitAuthor = sh(script: 'git log -1 --pretty=%ae', returnStdout: true).trim()
+                    if (commitAuthor == 'jenkins@example.com') {
+                        currentBuild.result = 'SUCCESS'
+                        currentBuild.description = 'Skipped - Jenkins automated commit'
+                        error('Build skipped - commit made by Jenkins')
+                    }
+                }
                 stash name:'code', includes:'**'
                 script {
                     deleteDir()
