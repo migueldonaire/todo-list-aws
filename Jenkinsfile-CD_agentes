@@ -9,7 +9,6 @@ pipeline {
                 git branch: 'master',
                     url: 'https://github.com/migueldonaire/todo-list-aws.git',
                     credentialsId: 'github-credentials'
-                stash name:'code', includes:'**'
                  sh '''
                     echo "Usuario actual:"
                     whoami
@@ -17,6 +16,7 @@ pipeline {
                     hostname
                     echo ${WORKSPACE}
                 '''
+                stash name:'code', includes:'**'
                 script {
                     deleteDir()
                 }

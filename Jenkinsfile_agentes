@@ -9,7 +9,15 @@ pipeline {
                 git branch: 'develop',
                     url: 'https://github.com/migueldonaire/todo-list-aws.git',
                     credentialsId: 'github-credentials'
-                 sh '''
+                script {
+                    def commitMsg = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
+                    if (commitMsg.contains('[skip ci]')) {
+                        currentBuild.result = 'SUCCESS'
+                        currentBuild.description = 'Skipped - Jenkins commit'
+                        error('Build skipped - commit contains [skip ci]')
+                    }
+                }
+                sh '''
                     echo "Usuario actual:"
                     whoami
                     echo "Nombre del host:"
