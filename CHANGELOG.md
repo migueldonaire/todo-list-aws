@@ -4,132 +4,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.7] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #47)
-
-## [1.0.6] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #46)
-
-## [1.0.5] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #42)
-
-## [1.0.4] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #19)
-
-## [1.0.3] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #41)
-
-## [1.0.2] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #40)
-
-## [1.0.1] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #39)
-
-## [1.0.0] - 2021-01-08
-### Added
-- Versión inicial de código.
-
-## [1.0.7] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #47)
-
-## [1.0.6] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #46)
-
-## [1.0.5] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #42)
-
-## [1.0.4] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #19)
-
-## [1.0.3] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #41)
-
-## [1.0.2] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #40)
-
-## [1.0.1] - 2021-01-08
-### Added
-- Versión jenkinsfile reto1.
-
-## [1.0.7] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #47)
-
-## [1.0.6] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #46)
-
-## [1.0.5] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #42)
-
-## [1.0.4] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #19)
-
-## [1.0.3] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #41)
-
-## [1.0.2] - 2021-01-08
-### Added
-- Versión jenkinsfile reto2.
-
-
-## [1.0.7] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #47)
-
-## [1.0.6] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #46)
-
-## [1.0.5] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #42)
-
-## [1.0.4] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #19)
-
-## [1.0.3] - 2021-01-08
-### Added
-- Versión jenkinsfile reto3.
-
-## [1.0.7] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #47)
-
-## [1.0.6] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #46)
-
-## [1.0.5] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #42)
-
-## [1.0.4] - 2021-01-08
-### Added
-- Fix docker cloud config
-
-
-## [1.0.7] - 2026-02-11
-### Changed
-- Actualizado automáticamente por Jenkins (Build #47)
-
 ## [1.0.6] - 2021-01-08
 ### Added
 - Fix custom docker image with python
+
+## [1.0.5] - 2021-01-08
+### Added
+- Fix docker cloud config
+
+## [1.0.4] - 2021-01-08
+### Added
+- Versión jenkinsfile reto3.
+
+## [1.0.3] - 2021-01-08
+### Added
+- Versión jenkinsfile reto2.
+
+## [1.0.2] - 2021-01-08
+### Added
+- Versión jenkinsfile reto1.
+
+## [1.0.1] - 2021-01-08
+### Added
+- Versión inicial de código.

@@ -3,20 +3,23 @@ pipeline {
 
     options { skipDefaultCheckout() }
 
+    triggers {
+        GenericTrigger(
+            genericVariables: [
+                [key: 'commit_message', value: '$.head_commit.message']
+            ],
+            regexpFilterText: '$commit_message',
+            regexpFilterExpression: '^(?!.*\\[skip ci\\]).*$'
+        )
+    }
+
+
     stages {
         stage('Get Code') {
             steps {
                 git branch: 'develop',
                     url: 'https://github.com/migueldonaire/todo-list-aws.git',
                     credentialsId: 'github-credentials'
-                script {
-                    def commitMsg = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
-                    if (commitMsg.contains('[skip ci]')) {
-                        currentBuild.result = 'SUCCESS'
-                        currentBuild.description = 'Skipped - Jenkins commit'
-                        error('Build skipped - commit contains [skip ci]')
-                    }
-                }
                 stash name:'code', includes:'**'
                 script {
                     deleteDir()
@@ -115,9 +118,12 @@ pipeline {
                         # Fecha actual
                         TODAY=$(date +%Y-%m-%d)
 
-                        # Crear nueva entrada en CHANGELOG
-                        sed -i "/^## \\[${LAST_VERSION}\\]/i ## [${NEW_VERSION}] - ${TODAY}\\n### Changed\\n- Actualizado automáticamente por Jenkins (Build #${BUILD_NUMBER})\\n" CHANGELOG.md
-
+                        # Crear nueva entrada en CHANGELOG (insertar en línea 7)
+                        sed -i "7i\\
+## [${NEW_VERSION}] - ${TODAY}\\
+### Changed\\
+- Actualizado automáticamente por Jenkins (Build #${BUILD_NUMBER})\\
+" CHANGELOG.md
                         # Commit en develop
                         git add CHANGELOG.md
                         git commit -m "chore: bump version to ${NEW_VERSION} [skip ci]"
