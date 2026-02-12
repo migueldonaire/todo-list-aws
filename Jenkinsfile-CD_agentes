@@ -31,7 +31,7 @@ pipeline {
                     hostname
                     echo ${WORKSPACE}
                     sam build
-                    sam deploy --config-env production --no-fail-on-empty-changeset --no-progressbar
+                    sam deploy --no-fail-on-empty-changeset --no-progressbar
                 '''
                 script {
                     deleteDir()
