@@ -1,0 +1,143 @@
+pipeline {
+    agent any
+
+    options { skipDefaultCheckout() }
+
+    stages {
+        stage('Get Code') {
+            steps {
+                checkout scm
+                script {
+                    if (env.BRANCH_NAME == 'develop') {
+                        sh '''
+                            curl -o samconfig.toml https://raw.githubusercontent.com/migueldonaire/todo-list-aws-config/staging/samconfig.toml
+                            echo "Downloaded samconfig.toml from config repo (staging)"
+                            cat samconfig.toml
+                        '''
+                    } else if (env.BRANCH_NAME == 'master') {
+                        sh '''
+                            curl -o samconfig.toml https://raw.githubusercontent.com/migueldonaire/todo-list-aws-config/production/samconfig.toml
+                            echo "Downloaded samconfig.toml from config repo (production)"
+                            cat samconfig.toml
+                        '''
+                    }
+                }
+                stash name:'code', includes:'**'
+                script {
+                    deleteDir()
+                }
+            }
+        }
+
+        stage('Static Test') {
+            when { branch 'develop' }
+            agent { label 'static-agent' }
+            steps {
+                unstash name:'code'
+                sh '''
+                    echo "=== Agent Info ==="
+                    echo "Node Name: ${NODE_NAME}"
+                    echo "User: $(whoami)"
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install flake8 flake8-html bandit
+                    flake8 src/ --format=html --htmldir=flake8-report || true
+                    bandit -r src/ -f html -o bandit-report.html || true
+                '''
+            }
+            post {
+                always {
+                    publishHTML(target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'flake8-report',
+                        reportFiles: 'index.html',
+                        reportName: 'Flake8'
+                    ])
+                    publishHTML(target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: '.',
+                        reportFiles: 'bandit-report.html',
+                        reportName: 'Bandit'
+                    ])
+                    deleteDir()
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                unstash name:'code'
+                sh '''
+                    echo "Deploying to ${BRANCH_NAME}..."
+                    sam build
+                    sam deploy --no-fail-on-empty-changeset --no-progressbar
+                '''
+                script {
+                    deleteDir()
+                }
+            }
+        }
+
+        stage('Rest Test') {
+            agent { label 'rest-agent' }
+            steps {
+                unstash name:'code'
+                script {
+                    def stackName = (env.BRANCH_NAME == 'master') ? 'todo-list-aws-production' : 'todo-list-aws-staging'
+                    def testFilter = (env.BRANCH_NAME == 'master') ? '-k "test_api_listtodos or test_api_gettodo"' : ''
+
+                    sh """
+                        echo "=== Agent Info ==="
+                        echo "Node Name: \${NODE_NAME}"
+                        echo "User: \$(whoami)"
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        pip install pytest boto3 requests
+                        BASE_URL=\$(aws cloudformation describe-stacks \\
+                            --stack-name ${stackName} \\
+                            --query 'Stacks[0].Outputs[?OutputKey==`BaseUrlApi`].OutputValue' \\
+                            --region us-east-1 \\
+                            --output text)
+                        export BASE_URL
+                        pytest test/integration/todoApiTest.py ${testFilter} -v
+                    """
+                }
+                script {
+                    deleteDir()
+                }
+            }
+        }
+
+        stage('Promote') {
+            when { branch 'develop' }
+            steps {
+                checkout scm
+                withCredentials([usernamePassword(credentialsId: 'github-credentials', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
+                    sh '''
+                        git config user.email "jenkins@example.com"
+                        git config user.name "Jenkins"
+                        git remote set-url origin https://${GIT_USER}:${GIT_TOKEN}@github.com/migueldonaire/todo-list-aws.git
+
+                        # Merge a master
+                        git checkout master
+                        git merge develop
+                        git push origin master
+                    '''
+                }
+                script {
+                    deleteDir()
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
