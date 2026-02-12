@@ -122,9 +122,12 @@ pipeline {
                         git config user.name "Jenkins"
                         git remote set-url origin https://${GIT_USER}:${GIT_TOKEN}@github.com/migueldonaire/todo-list-aws.git
 
+                        # Fetch all branches
+                        git fetch origin
+
                         # Merge a master
                         git checkout master
-                        git merge develop
+                        git merge origin/develop
                         git push origin master
                     '''
                 }
