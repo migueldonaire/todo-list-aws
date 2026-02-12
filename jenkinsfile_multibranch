@@ -132,7 +132,7 @@ pipeline {
                     '''
                 }
                 // Trigger master branch pipeline
-                build job: "cp1.4_Reto_5/master", wait: false
+                build job: "Reto 5/master", wait: false
                 script {
                     deleteDir()
                 }
