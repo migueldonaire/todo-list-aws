@@ -10,11 +10,9 @@ pipeline {
                     url: 'https://github.com/migueldonaire/todo-list-aws.git',
                     credentialsId: 'github-credentials'
                 sh '''
-                    echo "Usuario actual:"
-                    whoami
-                    echo "Nombre del host:"
-                    hostname
-                    echo ${WORKSPACE}
+                    curl -o samconfig.toml https://raw.githubusercontent.com/migueldonaire/todo-list-aws-config/production/samconfig.toml
+                    echo "Downloaded samconfig.toml from config repo (production)"
+                    cat samconfig.toml
                 '''
                 stash name:'code', includes:'**'
                 script {
