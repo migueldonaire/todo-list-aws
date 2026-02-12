@@ -133,8 +133,9 @@ pipeline {
                 }
                 // Trigger master branch pipeline
                 script {
-                    def jobBaseName = env.JOB_NAME.replaceAll('/develop', '')
-                    build job: "${jobBaseName}/master", wait: false
+                    def masterJob = env.JOB_NAME.replace('/develop', '/master')
+                    echo "Triggering job: ${masterJob}"
+                    build job: masterJob, wait: false
                 }
                 script {
                     deleteDir()
